@@ -296,10 +296,31 @@ function saveState(){
 
 function today(){ return new Date().toISOString().slice(0,10); }
 
+function getMonday(dateStr){
+  const d = new Date(dateStr+'T12:00:00');
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day===0 ? -6 : 1);
+  d.setDate(diff);
+  return d.toISOString().slice(0,10);
+}
+
+function getMonth(dateStr){ return dateStr.slice(0,7); }
+
 function checkDayRollover(){
   const t = today();
   if(state.lastDate && state.lastDate !== t){
     state.completedToday = {};
+
+    // Week reset: if we've crossed into a new Monday-based week
+    if(getMonday(t) !== getMonday(state.lastDate)){
+      state.weekStars = 0;
+    }
+
+    // Month reset: if we've crossed into a new calendar month
+    if(getMonth(t) !== getMonth(state.lastDate)){
+      state.monthStars = 0;
+      state.claimedRewards = {};
+    }
   }
   state.lastDate = t;
   saveState();
