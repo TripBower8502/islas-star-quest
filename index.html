@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Star Quest">
+<meta name="theme-color" content="#0f2419">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f2419' width='100' height='100' rx='20'/><text y='68' x='50' text-anchor='middle' font-size='55'>🦕</text></svg>">
+<title>Isla's Star Quest</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--accent:#2dd4c8;--accent-dark:#1aa89e;--bg:#0f2419;--bg2:#163022;--bg3:#1d3d2c;--card:#1a3527;--card2:#224435;--text:#e8f5e9;--text2:#a5d6a7;--text3:#6b9b7a;--gold:#ffd700;--star:#fbbf24;--danger:#ef4444;--radius:16px}
+html,body{height:100dvh;height:100%;overflow:hidden;overscroll-behavior:none}
+@supports(height:100dvh){html,body{height:100dvh}}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden;padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(45,212,200,.07) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(45,212,200,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
+
+/* Animated leaves */
+.leaf{position:fixed;font-size:24px;opacity:.15;animation:leafFall linear infinite;pointer-events:none;z-index:0}
+@keyframes leafFall{0%{transform:translateY(-60px) rotate(0deg)}100%{transform:translateY(110vh) rotate(360deg)}}
+
+.app{width:100%;max-width:480px;height:100%;display:flex;flex-direction:column;position:relative;z-index:1}
+
+/* Header */
+.header{padding:16px 16px 12px;background:linear-gradient(135deg,var(--bg2),var(--bg3));border-bottom:2px solid rgba(45,212,200,.2);flex-shrink:0}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.app-title{font-family:'Fredoka One',cursive;font-size:22px;color:var(--accent);text-shadow:0 2px 8px rgba(45,212,200,.3)}
+.dino-icon{font-size:28px;animation:dinoBounce 2s ease-in-out infinite}
+@keyframes dinoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.star-pools{display:flex;gap:8px}
+.pool{flex:1;background:var(--card);border-radius:12px;padding:8px 6px;text-align:center;border:1px solid rgba(45,212,200,.15)}
+.pool-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.pool-val{font-family:'Fredoka One',cursive;font-size:20px;color:var(--star)}
+.phone-bank{display:flex;align-items:center;justify-content:space-between;margin-top:10px;background:var(--card);border-radius:12px;padding:8px 12px;border:1px solid rgba(45,212,200,.15)}
+.phone-label{font-size:13px;color:var(--text2)}
+.phone-val{font-family:'Fredoka One',cursive;font-size:18px;color:var(--accent)}
+.trade-btn{background:var(--accent);color:var(--bg);border:none;border-radius:10px;padding:6px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;transition:all .15s}
+.trade-btn:active{transform:scale(.95)}
+.trade-btn:disabled{opacity:.4;cursor:default}
+
+/* Content area */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 16px 16px;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--accent-dark);border-radius:4px}
+
+/* Tabs */
+.tab-bar{display:flex;background:var(--bg2);border-top:2px solid rgba(45,212,200,.2);flex-shrink:0;padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:4px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:12px;border:none;background:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s}
+.tab.active{background:rgba(45,212,200,.15);color:var(--accent)}
+.tab-icon{font-size:20px}
+
+/* Quest categories */
+.category{margin-bottom:16px}
+.cat-header{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(135deg,var(--card),var(--card2));border-radius:var(--radius) var(--radius) 0 0;border:1px solid rgba(45,212,200,.15);border-bottom:none;cursor:pointer;user-select:none}
+.cat-header:active{background:var(--card2)}
+.cat-icon{font-size:22px}
+.cat-name{font-family:'Fredoka One',cursive;font-size:15px;flex:1}
+.cat-count{font-size:12px;color:var(--text3);font-weight:700}
+.cat-chevron{font-size:14px;color:var(--text3);transition:transform .2s}
+.cat-header.open .cat-chevron{transform:rotate(180deg)}
+.task-list{background:var(--card);border:1px solid rgba(45,212,200,.1);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden}
+.task-list.collapsed{display:none}
+
+.task{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid rgba(45,212,200,.06);cursor:pointer;transition:background .15s;user-select:none}
+.task:last-child{border-bottom:none}
+.task:active{background:rgba(45,212,200,.08)}
+.task.done{opacity:.6}
+.task-emoji{font-size:20px;flex-shrink:0}
+.task-info{flex:1;min-width:0}
+.task-name{font-size:13px;font-weight:700;line-height:1.3}
+.task.done .task-name{text-decoration:line-through}
+.task-stars{font-size:11px;color:var(--star)}
+.task-check{width:28px;height:28px;border-radius:50%;border:2px solid var(--text3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;transition:all .2s}
+.task.done .task-check{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+
+/* Rewards */
+.reward-tier{margin-bottom:20px}
+.tier-title{font-family:'Fredoka One',cursive;font-size:16px;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.reward{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card);border:1px solid rgba(45,212,200,.1);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .15s;user-select:none}
+.reward:active{transform:scale(.98)}
+.reward.claimed{opacity:.5}
+.reward-name{flex:1;font-size:13px;font-weight:700}
+.reward-cost{font-size:12px;color:var(--star);font-weight:800;white-space:nowrap}
+.reward-status{font-size:16px}
+
+/* Progress */
+.progress-section{margin-bottom:20px}
+.section-title{font-family:'Fredoka One',cursive;font-size:15px;color:var(--accent);margin-bottom:10px}
+.progress-bar-wrap{background:var(--card);border-radius:12px;padding:12px;border:1px solid rgba(45,212,200,.1)}
+.progress-bar-outer{height:20px;background:var(--bg);border-radius:10px;overflow:hidden;margin-top:6px}
+.progress-bar-inner{height:100%;background:linear-gradient(90deg,var(--accent),var(--star));border-radius:10px;transition:width .5s ease}
+.progress-label{font-size:12px;color:var(--text2);font-weight:700}
+.day-pips{display:flex;gap:6px;margin-top:12px;justify-content:center}
+.pip{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--text3);border:2px solid rgba(45,212,200,.15)}
+.pip.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.summer-grid{display:grid;grid-template-columns:repeat(13,1fr);gap:3px}
+.grid-cell{aspect-ratio:1;border-radius:4px;background:var(--bg);border:1px solid rgba(45,212,200,.08)}
+.grid-cell.filled{background:var(--accent);border-color:var(--accent)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--card);border-radius:12px;padding:12px;text-align:center;border:1px solid rgba(45,212,200,.1)}
+.stat-val{font-family:'Fredoka One',cursive;font-size:22px;color:var(--accent)}
+.stat-label{font-size:11px;color:var(--text3);font-weight:700;margin-top:2px}
+
+/* Settings */
+.settings-btn{display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;background:var(--card);border:1px solid rgba(45,212,200,.1);border-radius:12px;margin-bottom:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--text);transition:all .15s}
+.settings-btn:active{transform:scale(.98)}
+.settings-btn.danger{border-color:rgba(239,68,68,.3);color:var(--danger)}
+.settings-btn .icon{font-size:20px}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--card2);color:var(--text);padding:12px 20px;border-radius:14px;font-weight:700;font-size:14px;z-index:1000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);border:2px solid var(--accent);box-shadow:0 8px 32px rgba(0,0,0,.4);pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* Confetti */
+.confetti-piece{position:fixed;width:10px;height:10px;z-index:999;pointer-events:none;border-radius:2px}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+
+/* Confirm modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:2px solid var(--accent);text-align:center}
+.modal h3{font-family:'Fredoka One',cursive;font-size:18px;color:var(--accent);margin-bottom:8px}
+.modal p{font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+.modal-btns{display:flex;gap:8px}
+.modal-btn{flex:1;padding:12px;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer}
+.modal-btn.confirm{background:var(--accent);color:var(--bg)}
+.modal-btn.cancel{background:var(--card);color:var(--text)}
+.modal-btn.danger-confirm{background:var(--danger);color:#fff}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="app-title">Isla's Star Quest</div>
+      <div class="dino-icon">🦕</div>
+    </div>
+    <div class="star-pools">
+      <div class="pool"><div class="pool-label">Week</div><div class="pool-val" id="weekStars">0</div></div>
+      <div class="pool"><div class="pool-label">Month</div><div class="pool-val" id="monthStars">0</div></div>
+      <div class="pool"><div class="pool-label">Total</div><div class="pool-val" id="totalStars">0</div></div>
+    </div>
+    <div class="phone-bank">
+      <div><div class="phone-label">📱 Phone Time</div></div>
+      <div class="phone-val" id="phoneMins">0 min</div>
+      <button class="trade-btn" id="tradeBtn" onclick="tradeStars()">Trade ⭐→📱</button>
+    </div>
+  </div>
+
+  <div class="content" id="content"></div>
+
+  <div class="tab-bar">
+    <button class="tab active" data-tab="quests" onclick="switchTab('quests')"><span class="tab-icon">⚔️</span>Quests</button>
+    <button class="tab" data-tab="rewards" onclick="switchTab('rewards')"><span class="tab-icon">🎁</span>Rewards</button>
+    <button class="tab" data-tab="progress" onclick="switchTab('progress')"><span class="tab-icon">📊</span>Progress</button>
+    <button class="tab" data-tab="settings" onclick="switchTab('settings')"><span class="tab-icon">⚙️</span>Settings</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMsg"></p>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn confirm" id="modalConfirm">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// === DATA ===
+const CATEGORIES = [
+  { id:'outside', name:'Outside & Active', icon:'🌿', tasks:[
+    {id:'bike',name:'Ride a bike for 30 minutes',stars:1,emoji:'🚲'},
+    {id:'walk',name:'Go for a walk or hike outside',stars:1,emoji:'🥾'},
+    {id:'play-outside',name:'Play outside for 1 whole hour',stars:1,emoji:'☀️'},
+    {id:'swim',name:'Swim or splash around in water',stars:1,emoji:'🏊'},
+    {id:'active-skill',name:'Learn a new active skill',stars:2,emoji:'🤸'},
+    {id:'sport',name:'Run, skip, or play a sport with someone',stars:1,emoji:'⚽'},
+  ]},
+  { id:'nature', name:'Nature & Exploration', icon:'🌍', tasks:[
+    {id:'spot',name:'Spot and identify a bird, bug, or plant',stars:1,emoji:'🔍'},
+    {id:'collect',name:'Collect something from nature and make a display',stars:2,emoji:'🪨'},
+    {id:'sunrise',name:'Watch a sunrise or sunset',stars:2,emoji:'🌅'},
+    {id:'plant',name:'Plant something and water it for 3 days',stars:2,emoji:'🌱'},
+  ]},
+  { id:'mind', name:'Mind & Learning', icon:'📚', tasks:[
+    {id:'read',name:'Read for 20 minutes',stars:1,emoji:'📖'},
+    {id:'finish-book',name:'Finish a whole book!',stars:3,emoji:'🏅'},
+    {id:'puzzle',name:'Do a puzzle (50+ pieces)',stars:1,emoji:'🧩'},
+    {id:'words',name:'Learn 5 new words and use them today',stars:1,emoji:'💬'},
+    {id:'documentary',name:'Watch a nature documentary & share 3 facts',stars:1,emoji:'🎬'},
+    {id:'journal',name:'Write in a journal or diary',stars:1,emoji:'✏️'},
+    {id:'math',name:'Complete a page of math or spelling practice',stars:1,emoji:'📝'},
+    {id:'recite',name:'Memorize and recite a poem or fun fact',stars:1,emoji:'🎤'},
+    {id:'board-game',name:'Play a strategy board game',stars:1,emoji:'♟️'},
+    {id:'language',name:'Learn to count to 10 in a new language',stars:2,emoji:'🌐'},
+  ]},
+  { id:'creative', name:'Creative', icon:'🎨', tasks:[
+    {id:'draw',name:'Draw, paint, or color something',stars:1,emoji:'🎨'},
+    {id:'write-story',name:'Write a story or poem',stars:1,emoji:'📝'},
+    {id:'craft',name:'Make a craft project',stars:1,emoji:'✂️'},
+    {id:'photos',name:'Take photos and make a mini album',stars:2,emoji:'📸'},
+    {id:'build',name:'Build something awesome',stars:2,emoji:'🏗️'},
+    {id:'perform-song',name:'Make up and perform a song or dance',stars:2,emoji:'🎤'},
+    {id:'comic',name:'Make a comic strip with at least 4 panels',stars:2,emoji:'💬'},
+    {id:'record-docu',name:'Record a nature documentary about your backyard',stars:2,emoji:'🎥'},
+    {id:'magic',name:'Learn and perform a magic trick',stars:2,emoji:'🪄'},
+    {id:'puppet',name:'Put on a puppet show or play for someone',stars:2,emoji:'🎭'},
+  ]},
+  { id:'life', name:'Life Skills', icon:'🍳', tasks:[
+    {id:'cook',name:'Help cook or bake something',stars:2,emoji:'🍳'},
+    {id:'chore',name:'Do a chore without being asked',stars:1,emoji:'🧹'},
+    {id:'learn-self',name:'Learn something new you can do yourself',stars:2,emoji:'💪'},
+    {id:'letter',name:'Write a letter or card to someone you love',stars:2,emoji:'💌'},
+    {id:'organize',name:'Organize your room or a messy space',stars:1,emoji:'🗂️'},
+    {id:'pack',name:'Help plan and pack for an outing',stars:1,emoji:'🎒'},
+    {id:'water-plants',name:'Water plants or help in the garden',stars:1,emoji:'🪴'},
+    {id:'table',name:'Set the table and help clean up after dinner',stars:1,emoji:'🍽️'},
+    {id:'laundry',name:'Learn to fold laundry',stars:1,emoji:'👕'},
+    {id:'bed',name:'Make your bed 5 days in a row',stars:3,emoji:'🛏️'},
+  ]},
+  { id:'social', name:'Kind & Social', icon:'🤝', tasks:[
+    {id:'play-friend',name:'Play with a sibling or friend (no screens!) for 1 hour',stars:1,emoji:'👯'},
+    {id:'kind-secret',name:'Do something kind without telling anyone',stars:2,emoji:'💛'},
+    {id:'help-someone',name:'Help someone out with a task or problem',stars:1,emoji:'🤗'},
+    {id:'teach',name:'Teach someone else how to do something',stars:2,emoji:'🏫'},
+    {id:'kind-note',name:'Write a kind note and leave it for someone',stars:1,emoji:'💌'},
+  ]},
+  { id:'dino', name:'Dino Bonus Challenges', icon:'🦕', tasks:[
+    {id:'screen-free',name:'Spend a full day SCREEN-FREE!',stars:3,emoji:'🦕'},
+    {id:'try-new',name:"Try something you've NEVER done before",stars:2,emoji:'🦖'},
+    {id:'no-trade-week',name:"Complete a week and DON'T trade stars for phone time",stars:3,emoji:'🌟'},
+    {id:'scrapbook',name:'Add a page to your summer scrapbook',stars:2,emoji:'📒'},
+    {id:'pretend-dino',name:'Pretend to be a dinosaur for 10 whole minutes',stars:1,emoji:'🦕'},
+    {id:'name-dinos',name:'Name 5 different dinosaurs to a grown-up',stars:1,emoji:'🦴'},
+    {id:'draw-dinos',name:'Draw every dinosaur you can name',stars:2,emoji:'✏️'},
+    {id:'build-dino',name:'Build a dinosaur out of clay or household items',stars:2,emoji:'🏺'},
+    {id:'dino-story',name:'Write a story where a dinosaur is the hero',stars:2,emoji:'📖'},
+    {id:'teach-dino',name:"Teach a grown-up 3 dinosaur facts they didn't know",stars:1,emoji:'🦴'},
+  ]},
+];
+
+const REWARDS = {
+  weekly: {title:'Weekly Rewards', emoji:'📅', pool:'weekStars', items:[
+    {id:'movie-night',name:'Movie Night Pick',cost:10},
+    {id:'late-bedtime',name:'Late Bedtime',cost:12},
+    {id:'snack-choice',name:'Snack Choice',cost:10},
+    {id:'restaurant',name:'Restaurant Pick',cost:15},
+    {id:'nail-paint',name:'Nail Paint Session',cost:18},
+  ]},
+  monthly: {title:'Monthly Rewards', emoji:'🗓️', pool:'monthStars', items:[
+    {id:'small-toy',name:'Small Toy',cost:50},
+    {id:'day-trip',name:'Day Trip',cost:60},
+    {id:'sleepover',name:'Sleepover',cost:55},
+    {id:'craft-kit',name:'Craft Kit',cost:50},
+  ]},
+  summer: {title:'Summer Grand Prizes', emoji:'🏆', pool:'totalStars', items:[
+    {id:'big-toy',name:'Big Toy',cost:200},
+    {id:'amusement-park',name:'Amusement Park Trip',cost:300},
+    {id:'dino-museum',name:'Dinosaur Museum Experience',cost:250},
+    {id:'vacation-pick',name:'Choose Family Vacation Destination',cost:400},
+  ]},
+};
+
+const SUMMER_START = new Date(2025,5,1); // June 1
+const SUMMER_DAYS = 91;
+
+// === STATE ===
+let state;
+const DEFAULT_STATE = {completedToday:{},weekStars:0,monthStars:0,totalStars:0,phoneMins:0,lastDate:null,earnedDays:[],claimedRewards:{}};
+let currentTab = 'quests';
+let openCategories = {};
+
+function loadState(){
+  try{
+    const s = localStorage.getItem('isla_stars');
+    state = s ? JSON.parse(s) : {...DEFAULT_STATE};
+  } catch(e){ state = {...DEFAULT_STATE}; }
+  if(!state.earnedDays) state.earnedDays=[];
+  if(!state.claimedRewards) state.claimedRewards={};
+  if(!state.completedToday) state.completedToday={};
+  checkDayRollover();
+}
+
+function saveState(){
+  localStorage.setItem('isla_stars', JSON.stringify(state));
+  updateHeader();
+}
+
+function today(){ return new Date().toISOString().slice(0,10); }
+
+function checkDayRollover(){
+  const t = today();
+  if(state.lastDate && state.lastDate !== t){
+    state.completedToday = {};
+  }
+  state.lastDate = t;
+  saveState();
+}
+
+function updateHeader(){
+  document.getElementById('weekStars').textContent = state.weekStars;
+  document.getElementById('monthStars').textContent = state.monthStars;
+  document.getElementById('totalStars').textContent = state.totalStars;
+  const m = state.phoneMins;
+  document.getElementById('phoneMins').textContent = m >= 60 ? Math.floor(m/60)+'h '+m%60+'m' : m+' min';
+  document.getElementById('tradeBtn').disabled = state.weekStars < 1;
+}
+
+// === TABS ===
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+  render();
+}
+
+// === RENDERING ===
+function render(){
+  const c = document.getElementById('content');
+  c.scrollTop = 0;
+  switch(currentTab){
+    case 'quests': renderQuests(c); break;
+    case 'rewards': renderRewards(c); break;
+    case 'progress': renderProgress(c); break;
+    case 'settings': renderSettings(c); break;
+  }
+}
+
+function renderQuests(c){
+  let html = '';
+  CATEGORIES.forEach(cat => {
+    const isOpen = openCategories[cat.id] !== false;
+    const done = cat.tasks.filter(t=>state.completedToday[t.id]).length;
+    html += `<div class="category">
+      <div class="cat-header ${isOpen?'open':''}" onclick="toggleCat('${cat.id}')">
+        <span class="cat-icon">${cat.icon}</span>
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-count">${done}/${cat.tasks.length}</span>
+        <span class="cat-chevron">▼</span>
+      </div>
+      <div class="task-list ${isOpen?'':'collapsed'}" id="cat-${cat.id}">`;
+    cat.tasks.forEach(t => {
+      const isDone = !!state.completedToday[t.id];
+      html += `<div class="task ${isDone?'done':''}" onclick="toggleTask('${t.id}',${t.stars})">
+        <span class="task-emoji">${t.emoji}</span>
+        <div class="task-info">
+          <div class="task-name">${t.name}</div>
+          <div class="task-stars">${'⭐'.repeat(t.stars)} ${t.stars} star${t.stars>1?'s':''}</div>
+        </div>
+        <div class="task-check">${isDone?'✓':''}</div>
+      </div>`;
+    });
+    html += '</div></div>';
+  });
+  c.innerHTML = html;
+}
+
+function renderRewards(c){
+  let html = '';
+  Object.entries(REWARDS).forEach(([key,tier]) => {
+    const poolVal = state[tier.pool];
+    html += `<div class="reward-tier">
+      <div class="tier-title">${tier.emoji} ${tier.title} <span style="font-family:Nunito;font-size:12px;color:var(--text3);font-weight:700;margin-left:auto">${poolVal} ⭐ available</span></div>`;
+    tier.items.forEach(r => {
+      const claimed = !!state.claimedRewards[r.id];
+      const canAfford = poolVal >= r.cost && !claimed;
+      html += `<div class="reward ${claimed?'claimed':''}" onclick="${claimed?'':'claimReward(\''+r.id+'\','+r.cost+',\''+tier.pool+'\',\''+r.name+'\')'}">
+        <div class="reward-name">${r.name}</div>
+        <div class="reward-cost">${r.cost} ⭐</div>
+        <div class="reward-status">${claimed?'✅': canAfford?'🔓':'🔒'}</div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  c.innerHTML = html;
+}
+
+function renderProgress(c){
+  const weekGoal = 20;
+  const pct = Math.min(100, (state.weekStars/weekGoal)*100);
+  const days = ['S','M','T','W','T','F','S'];
+  const todayIdx = new Date().getDay();
+
+  // Figure out which days this week had activity
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  const weekDays = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate()+i);
+    weekDays.push(d.toISOString().slice(0,10));
+  }
+
+  let pipsHtml = '';
+  weekDays.forEach((d,i) => {
+    const active = state.earnedDays.includes(d);
+    pipsHtml += `<div class="pip ${active?'active':''}">${days[i]}</div>`;
+  });
+
+  // Summer grid
+  let gridHtml = '';
+  for(let i=0;i<SUMMER_DAYS;i++){
+    const d = new Date(SUMMER_START);
+    d.setDate(d.getDate()+i);
+    const ds = d.toISOString().slice(0,10);
+    gridHtml += `<div class="grid-cell ${state.earnedDays.includes(ds)?'filled':''}"></div>`;
+  }
+
+  const daysActive = state.earnedDays.length;
+  const rewardsClaimed = Object.keys(state.claimedRewards).length;
+
+  c.innerHTML = `
+    <div class="progress-section">
+      <div class="section-title">🎯 Weekly Goal: ${weekGoal} Stars</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-label">${state.weekStars} / ${weekGoal} stars</div>
+        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pct}%"></div></div>
+        <div class="day-pips">${pipsHtml}</div>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="section-title">☀️ Summer Grid (June-August)</div>
+      <div class="progress-bar-wrap">
+        <div class="summer-grid">${gridHtml}</div>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="section-title">📊 Fun Stats</div>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-val">${daysActive}</div><div class="stat-label">Days Active</div></div>
+        <div class="stat"><div class="stat-val">${state.totalStars}</div><div class="stat-label">Total Stars</div></div>
+        <div class="stat"><div class="stat-val">${state.phoneMins}m</div><div class="stat-label">Phone Time</div></div>
+        <div class="stat"><div class="stat-val">${rewardsClaimed}</div><div class="stat-label">Rewards Claimed</div></div>
+      </div>
+    </div>`;
+}
+
+function renderSettings(c){
+  c.innerHTML = `
+    <div style="padding:8px 0">
+      <div style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--accent);margin-bottom:16px">🔧 Parent Controls</div>
+      <button class="settings-btn" onclick="settingsAction('newWeek')"><span class="icon">📅</span>Start New Week</button>
+      <button class="settings-btn" onclick="settingsAction('newMonth')"><span class="icon">🗓️</span>Start New Month</button>
+      <button class="settings-btn" onclick="settingsAction('bonusMins')"><span class="icon">🎁</span>Add 30 Bonus Minutes</button>
+      <button class="settings-btn" onclick="settingsAction('clearPhone')"><span class="icon">📱</span>Clear Phone Time</button>
+      <button class="settings-btn danger" onclick="settingsAction('fullReset')"><span class="icon">⚠️</span>Full Reset</button>
+    </div>`;
+}
+
+// === ACTIONS ===
+function toggleCat(id){
+  openCategories[id] = openCategories[id] === false ? true : false;
+  render();
+}
+
+function toggleTask(id, stars){
+  if(state.completedToday[id]){
+    delete state.completedToday[id];
+    state.weekStars = Math.max(0, state.weekStars - stars);
+    state.monthStars = Math.max(0, state.monthStars - stars);
+    state.totalStars = Math.max(0, state.totalStars - stars);
+    showToast('Undone! -'+stars+' ⭐');
+  } else {
+    state.completedToday[id] = true;
+    state.weekStars += stars;
+    state.monthStars += stars;
+    state.totalStars += stars;
+    const t = today();
+    if(!state.earnedDays.includes(t)) state.earnedDays.push(t);
+    showToast('+'+stars+' ⭐ Roar! Great job!');
+    confetti();
+  }
+  saveState();
+  render();
+}
+
+function tradeStars(){
+  if(state.weekStars < 1) return;
+  showModal('Trade Stars?', '1 ⭐ = 15 minutes phone time. Trade 1 star now?', () => {
+    state.weekStars -= 1;
+    state.monthStars = Math.max(0, state.monthStars - 1);
+    state.totalStars = Math.max(0, state.totalStars - 1);
+    state.phoneMins += 15;
+    saveState();
+    render();
+    showToast('📱 +15 minutes phone time!');
+  });
+}
+
+function claimReward(id, cost, pool, name){
+  if(state.claimedRewards[id]) return;
+  if(state[pool] < cost){ showToast('Not enough stars yet!'); return; }
+  showModal('Claim Reward?', `Spend ${cost} ⭐ for "${name}"?`, () => {
+    state[pool] -= cost;
+    state.claimedRewards[id] = true;
+    saveState();
+    render();
+    showToast('🎉 Reward claimed: '+name);
+    confetti();
+  });
+}
+
+function settingsAction(action){
+  switch(action){
+    case 'newWeek':
+      showModal('Start New Week?','This clears today\'s tasks and resets weekly stars to 0.', () => {
+        state.completedToday = {};
+        state.weekStars = 0;
+        saveState(); render();
+        showToast('New week started! 🌟');
+      }); break;
+    case 'newMonth':
+      showModal('Start New Month?','This resets weekly & monthly stars and clears claimed rewards.', () => {
+        state.completedToday = {};
+        state.weekStars = 0;
+        state.monthStars = 0;
+        state.claimedRewards = {};
+        saveState(); render();
+        showToast('New month started! 🗓️');
+      }); break;
+    case 'bonusMins':
+      state.phoneMins += 30;
+      saveState();
+      showToast('🎁 +30 bonus minutes added!');
+      break;
+    case 'clearPhone':
+      showModal('Clear Phone Time?','Set phone time bank to 0 minutes?', () => {
+        state.phoneMins = 0;
+        saveState(); render();
+        showToast('Phone time cleared');
+      }); break;
+    case 'fullReset':
+      showModal('Full Reset?','This erases ALL data and starts over. Are you sure?', () => {
+        localStorage.removeItem('isla_stars');
+        state = {...DEFAULT_STATE, lastDate: today()};
+        saveState(); render();
+        showToast('All data reset');
+      }, true); break;
+  }
+}
+
+// === UI HELPERS ===
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function showModal(title, msg, onConfirm, danger=false){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').textContent = msg;
+  const btn = document.getElementById('modalConfirm');
+  btn.className = 'modal-btn ' + (danger ? 'danger-confirm' : 'confirm');
+  btn.textContent = danger ? 'Reset Everything' : 'Yes!';
+  btn.onclick = () => { closeModal(); onConfirm(); };
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function confetti(){
+  const colors = ['#2dd4c8','#fbbf24','#ef4444','#a78bfa','#34d399','#f472b6','#fbbf24'];
+  for(let i=0;i<30;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random()*100+'vw';
+    el.style.top = '-10px';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.width = (6+Math.random()*8)+'px';
+    el.style.height = (6+Math.random()*8)+'px';
+    el.style.borderRadius = Math.random()>.5?'50%':'2px';
+    el.style.animation = `confettiFall ${1.5+Math.random()*2}s ease-out forwards`;
+    el.style.animationDelay = Math.random()*0.3+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 4000);
+  }
+}
+
+// Floating leaves
+function createLeaves(){
+  const leaves = ['🍃','🌿','🍀','🌱'];
+  for(let i=0;i<8;i++){
+    const el = document.createElement('div');
+    el.className = 'leaf';
+    el.textContent = leaves[Math.floor(Math.random()*leaves.length)];
+    el.style.left = Math.random()*100+'%';
+    el.style.fontSize = (16+Math.random()*16)+'px';
+    el.style.animationDuration = (15+Math.random()*20)+'s';
+    el.style.animationDelay = Math.random()*20+'s';
+    document.body.appendChild(el);
+  }
+}
+
+// Prevent iOS rubber-band bounce on body, allow content scroll
+document.body.addEventListener('touchmove', function(e){
+  if(!e.target.closest('.content, .modal-overlay')) e.preventDefault();
+}, {passive:false});
+
+// === INIT ===
+loadState();
+createLeaves();
+render();
+</script>
+</body>
+</html>
