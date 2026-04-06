@@ -47,7 +47,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .content::-webkit-scrollbar-thumb{background:var(--accent-dark);border-radius:4px}
 
 /* Tabs */
-.tab-bar{display:flex;background:var(--bg2);border-top:2px solid rgba(45,212,200,.2);flex-shrink:0;padding:4px 6px;padding-bottom:env(safe-area-inset-bottom, 4px);gap:3px}
+.tab-bar{display:flex;background:var(--bg2);border-top:2px solid rgba(45,212,200,.2);flex-shrink:0;padding:4px 6px 4px;gap:3px}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 4px 4px;border-radius:10px;border:none;background:none;color:var(--text3);font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s}
 .tab.active{background:rgba(45,212,200,.15);color:var(--accent)}
 .tab-icon{font-size:18px}
@@ -111,7 +111,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .settings-btn .icon{font-size:20px}
 
 /* Toast */
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--card2);color:var(--text);padding:12px 20px;border-radius:14px;font-weight:700;font-size:14px;z-index:1000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);border:2px solid var(--accent);box-shadow:0 8px 32px rgba(0,0,0,.4);pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast{position:fixed;top:calc(env(safe-area-inset-top, 0px) + 80px);left:50%;transform:translateX(-50%) translateY(-200px);background:var(--card2);color:var(--text);padding:12px 20px;border-radius:14px;font-weight:700;font-size:14px;z-index:1000;transition:transform .4s cubic-bezier(.34,1.56,.64,1);border:2px solid var(--accent);box-shadow:0 8px 32px rgba(0,0,0,.4);pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* Confetti */
